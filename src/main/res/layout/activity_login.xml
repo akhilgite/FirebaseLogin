@@ -45,7 +45,7 @@
 
 
 
-            <com.facebook.login.widget.LoginButton
+            <!--<com.facebook.login.widget.LoginButton
                 android:id="@+id/button_facebook_login"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
@@ -54,7 +54,31 @@
                 android:layout_marginRight="10dp"
                 android:textStyle="bold"
                 android:layout_gravity="center"
-                android:gravity="center"/>
+                android:gravity="center"
+                style="@style/FacebookLoginButton"/>-->
+
+            <FrameLayout
+                android:id="@+id/FrameLayout1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <com.facebook.login.widget.LoginButton
+                    android:id="@+id/button_facebook_login"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/fb"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#416BC1"
+                    android:onClick="onClick"
+                    android:text="FaceBook"
+                    android:textColor="#ffffff"
+                    android:textStyle="bold"
+                    android:textSize="24sp"/>
+            </FrameLayout>
 
 
         </LinearLayout>

@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.facebook.AccessToken;
@@ -41,7 +42,7 @@ import org.json.JSONObject;
 import java.util.Arrays;
 import java.util.List;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static final String TAG = "LoginActivity";
     public User user;
@@ -54,6 +55,8 @@ public class LoginActivity extends AppCompatActivity {
 
     //FaceBook callbackManager
     private CallbackManager callbackManager;
+    Button fbButton;
+    LoginButton loginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,8 @@ public class LoginActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mAuth = FirebaseAuth.getInstance();
+        fbButton=(Button)findViewById(R.id.fb);
+        fbButton.setOnClickListener((View.OnClickListener) this);
 
         FirebaseUser mUser = mAuth.getCurrentUser();
         if (mUser != null) {
@@ -97,14 +102,14 @@ public class LoginActivity extends AppCompatActivity {
         //FaceBook
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
-        LoginButton loginButton = (LoginButton) findViewById(R.id.button_facebook_login);
-        loginButton.setReadPermissions(Arrays.asList("email", "public_profile","user_friends"));
+        loginButton = (LoginButton) findViewById(R.id.button_facebook_login);
+        loginButton.setReadPermissions(Arrays.asList("email", "public_profile","user_friends","read_custom_friendlists"));
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.d(TAG, "facebook:onSuccess:" + loginResult);
-                //signInWithFacebook(loginResult.getAccessToken());
-                fetchAllFriendList(loginResult);
+                signInWithFacebook(loginResult.getAccessToken());
+                fetchAllFriendList();
             }
 
             @Override
@@ -146,10 +151,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void signInWithFacebook(AccessToken token) {
         Log.d(TAG, "signInWithFacebook:" + token);
-
         showProgressDialog();
-
-
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -179,7 +181,6 @@ public class LoginActivity extends AppCompatActivity {
 
                             mRef.child(uid).setValue(user);
 
-
                             /*Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             intent.putExtra("user_id",uid);
                             intent.putExtra("profile_picture",image);
@@ -192,30 +193,30 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    private void fetchAllFriendList(LoginResult loginResult) {
-        GraphRequest request = GraphRequest.newMeRequest(
-                loginResult.getAccessToken(),
-                new GraphRequest.GraphJSONObjectCallback() {
+    private void fetchAllFriendList() {
+        /*new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/me/friends",
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+            *//* handle the result *//*
+                        Log.e(TAG, "onCompleted: Response :: "+response);
+                    }
+                }
+        ).executeAsync();*/
+
+        GraphRequest request = GraphRequest.newMyFriendsRequest(
+                AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONArrayCallback() {
                     @Override
-                    public void onCompleted(
-                            JSONObject object,
-                            GraphResponse response) {
-                        // Application code
-
-                        try {
-                            JSONArray rawName=response.getJSONObject().getJSONArray("data");
-                            for (int i = 0; i < rawName.length(); i++) {
-                                Log.e(TAG, "onCompleted: Friends Name :: "+rawName.getJSONObject(i).getString("name"));
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
+                    public void onCompleted(JSONArray array, GraphResponse response) {
+                        // Insert your code here
+                        Log.e(TAG, "onCompleted: Array :: "+array);
                     }
                 });
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,link");
-        request.setParameters(parameters);
+
         request.executeAsync();
     }
 
@@ -234,7 +235,14 @@ public class LoginActivity extends AppCompatActivity {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         }
+
+
     }
 
 
+    @Override
+    public void onClick(View view) {
+        if (view.getId()==R.id.fb)
+            loginButton.performClick();
+    }
 }
