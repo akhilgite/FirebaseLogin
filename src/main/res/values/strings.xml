@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">FirebaseLogin</string>
+    <string name="facebook_app_id">183687048782986</string>
+    <string name="action_logout"> Log Out</string>
+    <string name="loading">Loading</string>
+    <string name="title_activity_main2">Main2Activity</string>
+</resources>
