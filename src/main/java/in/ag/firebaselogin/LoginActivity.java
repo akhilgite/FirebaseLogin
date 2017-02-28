@@ -239,7 +239,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     }
 
-
+//http://stackoverflow.com/questions/31327897/custom-facebook-login-button-android
     @Override
     public void onClick(View view) {
         if (view.getId()==R.id.fb)
